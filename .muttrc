@@ -1,0 +1,236 @@
+# Maus' configuration for Mutt
+
+source ~/.mutt/gpg.rc
+
+set ssl_use_tlsv1
+
+set spoolfile='imaps://mail.riseup.net/INBOX'   # where my new mail is located
+set smtp_url='smtp://maus@imap.riseup.net:587/'
+
+# Save sent mail in appropriately dated folders (same way pine does it, except that
+# mutt wont ask you every month if you want to move your mail and delete old saved
+# mailboxes (irritating when you have a couple years worth...)
+# send-hook . "set record=imaps://mail.riseup.net/INBOX.Sent"
+set record ="imaps://mail.riseup.net/INBOX.Sent"
+
+set certificate_file="~/.mutt/certificates"
+set header_cache="~/.mutt/cache/headers"
+set message_cachedir="~/.mutt/cache/bodies"
+
+set from = "maus@riseup.net"
+set realname = "Maus"
+
+set imap_user = maus
+unset imap_pass
+#set imap_passive=yes
+#set imap_servernoise=no
+
+# Header fields I don't normally want to see (easier to do it this way than
+# removing all the crusty microsoft headers
+ignore *                # this means "ignore all lines by default"
+
+# I do want to see these fields
+unignore        from: subject: to: cc: mail-followup-to \
+                date reply-to x-mailer x-url
+
+# Settings
+set abort_unmodified=yes
+set abort_nosubject=no
+set attribution="On %{%a, %d %b %Y}, %n wrote:\n" # how to attribute replies
+unset bounce_delivered                  # Postfix and qmail use Delivered-To for detecting loops
+set copy=yes                            # always save a copy of outgoing messages
+set edit_headers                        # let me edit the message header when composing
+set editor=vim                          # vim ftw
+set fast_reply                          # skip initial prompts when replying
+set followup_to=yes
+set include                             # always include message when replying
+set index_format="%4C %Z %2M %[!%y%m%d] %-17.17F (%3l) %s"
+set menu_scroll
+set menu_context=3
+set pager_index_lines=7
+set pager_stop=yes
+set postpone=ask-yes
+set read_inc=25                         # show progress when reading a mailbox
+set write_inc=25                        # show progress while writing mailboxes
+set reply_to                            # always use reply-to if present
+set reply_regexp="^(re:[ \t]*)+"        # how to identify replies in the subject:
+set tilde                               # virtual lines to pad blank lines in the pager
+set use_8bitmime                        # If your sendmail supports the -B8BITMIME flag, enable the following
+#unset use_domain                        # don't add the hostname to the From header
+#unset use_from                          # don't generate a From header
+set use_from
+unset user_agent
+# unset write_bcc                        # Exim does not remove Bcc headers
+
+# set indent_str="> "                     # sets the sting to put before included message
+# set ispell="aspell -e -c"
+# restore the behaviour of mutt versions up to 1.5.7
+# set menu_move_off
+# set resolve                             # move to the next message when an action is performed
+
+# Specifies how to sort messages in the index menu.
+set sort=threads
+set sort_aux=reverse-date-received      # how to sort subthreads
+set sort_aux=last-date                  # date of the last message in thread
+set sort_browser=reverse-date           # how to sort files in the dir browser
+
+# Other Settings
+set ascii_chars                         # No `-> Arrows
+set autoedit
+unset mark_old
+set timeout=12
+
+# folder-hook +INBOX      set strict_thread # ?
+
+unset strict_threads
+folder-hook .       unset   strict_threads
+folder-hook INBOX  set     strict_threads
+folder-hook OUTBOX set     strict_threads
+
+
+
+###
+
+ignore x-accept-language x-authentication-warning thread- priority
+
+# # emacs-like bindings
+# bind editor    "\e<delete>"    kill-word
+# bind editor    "\e<backspace>" kill-word
+
+# # map delete-char to a sane value
+# bind editor     <delete>  delete-char
+
+auto_view text/html text/enriched application/x-gunzip application/postscript image/gif application/x-tar-gz
+
+# # Start up with collapsed threads - you might not want this
+# #folder-hook . exec collapse-all
+# #folder-hook . "color index green black '~h in-reply-to:.*riseup.net'"
+# ## To show the number of messages in a collapsed thread
+# ## you need to add "%M" to the "index_format":
+# set index_format="%4C %Z %2M %[!%y%m%d] %-17.17F (%3l) %s"
+
+# Save sent mail in appropriately dated folders (same way pine does it, except that
+# mutt wont ask you every month if you want to move your mail and delete old saved
+# mailboxes (irritating when you have a couple years worth...)
+## send-hook . "set record=imaps://mail.riseup.net/INBOX.Sent"
+## set record ="imaps://mail.riseup.net/INBOX.Sent"
+
+# weed out binary-only announcements to -devel-changes
+#macro index \CW T!~s\(.*source.*\)\nWn^T~A\n "Weed out binary-only announcements"
+
+# imitate the old search-body function
+macro index \eb '/~b ' 'search in message bodies'
+
+# simulate the old url menu
+macro index \cb |urlview\n 'call urlview to extract URLs out of a message'
+macro pager \cb |urlview\n 'call urlview to extract URLs out of a message'
+set pipe_decode
+
+# Show documentation when pressing F1
+macro generic <f1> "!zcat /usr/share/doc/mutt/manual.txt.gz | sensible-pager\n" "Show Mutt documentation"
+macro index   <f1> "!zcat /usr/share/doc/mutt/manual.txt.gz | sensible-pager\n" "Show Mutt documentation"
+macro pager   <f1> "!zcat /usr/share/doc/mutt/manual.txt.gz | sensible-pager\n" "Show Mutt documentation"
+
+# Use folders which match on \\.gz$ or \\.bz2$ as [gb]zipped folders:
+open-hook	\\.gz$ "gzip -cd %f > %t"
+close-hook	\\.gz$ "gzip -c %t > %f"
+append-hook	\\.gz$ "gzip -c %t >> %f"
+open-hook	\\.bz2$ "bzip2 -cd %f > %t"
+close-hook	\\.bz2$ "bzip2 -c %t > %f"
+append-hook	\\.bz2$ "bzip2 -c %t >> %f"
+
+# If Mutt is unable to determine your site's domain name correctly, you can
+# set the default here.
+#
+# set hostname=cs.hmc.edu
+
+# colors
+color normal            white black
+color attachment        brightyellow black
+color hdrdefault        cyan black
+color indicator         black cyan
+color markers           brightred black
+color quoted            green black
+color signature         cyan black
+color status            brightgreen blue
+color tilde             blue black
+color tree              red black
+color header            brightgreen black ^From:
+color header            brightcyan black ^To:
+color header            brightcyan black ^Reply-To:
+color header            brightcyan black ^Cc:
+color header            brightblue black ^Subject:
+color body              brightred black [\-\.+_a-zA-Z0-9]+@[\-\.a-zA-Z0-9]+
+color body              brightblue black (https?|ftp)://[\-\.\,/%~_:?\#a-zA-Z0-9]+
+
+color index magenta default "~N"
+
+# aliases for broken MUAs
+charset-hook windows-1250 CP1250
+charset-hook windows-1251 CP1251
+charset-hook windows-1252 CP1252
+charset-hook windows-1253 CP1253
+charset-hook windows-1254 CP1254
+charset-hook windows-1255 CP1255
+charset-hook windows-1256 CP1256
+charset-hook windows-1257 CP1257
+charset-hook windows-1258 CP1258
+
+##
+## More settings
+##
+
+# GnuPG configuration
+#set pgp_decode_command="gpg  --charset utf-8   --status-fd=2 %?p?--passphrase-fd 0? --no-verbose --quiet  --batch  --output - %f"
+#set pgp_verify_command="gpg   --status-fd=2 --no-verbose --quiet  --batch  --output - --verify %s %f"
+#set pgp_decrypt_command="gpg   --status-fd=2 %?p?--passphrase-fd 0? --no-verbose --quiet  --batch  --output - %f"
+#set pgp_sign_command="gpg    --no-verbose --batch --quiet   --output - %?p?--passphrase-fd 0? --armor --detach-sign --textmode %?a?-u %a? %$
+#set pgp_clearsign_command="gpg   --charset utf-8 --no-verbose --batch --quiet   --output - %?p?--passphrase-fd 0? --armor --textmode --clea$
+#set pgp_encrypt_only_command="/usr/lib/mutt/pgpewrap gpg  --charset utf-8    --batch  --quiet  --no-verbose --output - --encrypt --textmode$
+#set pgp_encrypt_sign_command="/usr/lib/mutt/pgpewrap gpg  --charset utf-8 %?p?--passphrase-fd 0?  --batch --quiet  --no-verbose  --textmode$
+#set pgp_import_command="gpg  --no-verbose --import %f"
+#set pgp_export_command="gpg   --no-verbose --export --armor %r"
+#set pgp_verify_key_command="gpg   --verbose --batch  --fingerprint --check-sigs %r"
+#set pgp_list_pubring_command="gpg   --no-verbose --batch --quiet   --with-colons --list-keys %r"
+#set pgp_list_secring_command="gpg   --no-verbose --batch --quiet   --with-colons --list-secret-keys %r"
+#set pgp_good_sign="^\\[GNUPG:\\] GOODSIG"
+
+
+# S/MIME configuration
+set smime_ca_location="~/.smime/ca-bundle.crt"
+set smime_certificates="~/.smime/certificates"
+set smime_keys="~/.smime/keys"
+set smime_pk7out_command="openssl smime -verify -in %f -noverify -pk7out"
+set smime_get_cert_command="openssl pkcs7 -print_certs -in %f"
+set smime_get_signer_cert_command="openssl smime -verify -in %f -noverify -signer %c -out /dev/null"
+set smime_get_cert_email_command="openssl x509 -in %f -noout -email"
+set smime_import_cert_command="smime_keys add_cert %f"
+set smime_encrypt_command="openssl smime -encrypt -%a -outform DER -in %f %c"
+set smime_sign_command="openssl smime -sign -signer %c -inkey %k -passin stdin -in %f -certfile %i -outform DER"
+# This alternative command does not include the full certificates chain.
+# Be sure to understand RFC2315 section 9.1 before using it.
+# set smime_sign_command="openssl smime -sign -signer %c -inkey %k -passin stdin -in %f -outform DER"
+set smime_decrypt_command="openssl smime -decrypt -passin stdin -inform DER -in %f -inkey %k -recip %c"
+set smime_verify_command="openssl smime -verify -inform DER -in %s %C -content %f"
+set smime_verify_opaque_command="openssl smime -verify -inform DER -in %s %C"
+
+# # Act somewhat like pine
+# bind index ' ' next-page
+# bind index c mail
+# bind index g change-folder
+# bind index w search
+# bind index x sync-mailbox
+# bind index 3 group-reply
+# bind pager R group-reply
+# bind pager ' ' next-page
+# bind pager g change-folder
+# bind pager c mail
+# bind pager w search
+# bind pager <up> previous-line
+# bind pager <down> next-line
+# 
+# bind compose \cx send-message
+
+bind    index   G last-entry
+
+# EOF  vim: et nowrap ft=muttrc
